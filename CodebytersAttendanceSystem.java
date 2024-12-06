@@ -5,7 +5,10 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.ArrayList;
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumnModel;
 
 public class CodebytersAttendanceSystem {
 
@@ -135,32 +138,7 @@ public class CodebytersAttendanceSystem {
 
         // Automatically load existing events when the application starts
         loadExistingEvents(); // This is the key line that will automatically load events
-        
-        createAttendancePanel();
     }
-    private static void createAttendancePanel() {
-    // Initialize panelAttendance (the panel for attendance-related controls)
-    JPanel panelAttendance = new JPanel();
-    panelAttendance.setLayout(new FlowLayout(FlowLayout.LEFT));
-    panelAttendance.setPreferredSize(new Dimension(800, 80));  // Set the height for the attendance panel
-    panelAttendance.setBackground(Color.LIGHT_GRAY);  // Background color for distinction
-
-    // Search Bar (JTextField) for attendance search
-    JTextField searchField = new JTextField(20);  // Create a text field for search input
-    searchField.setToolTipText("Search Attendance");
-    panelAttendance.add(new JLabel("Search Attendance: "));
-    panelAttendance.add(searchField);
-
-    // Combo Box (JComboBox) for filtering attendance
-    String[] comboBoxItems = {"All Students", "Present", "Absent", "Late"};  // Sample items for combo box
-    JComboBox<String> comboBox = new JComboBox<>(comboBoxItems);
-    comboBox.setToolTipText("Filter by Status");
-    panelAttendance.add(new JLabel("Filter by Status: "));
-    panelAttendance.add(comboBox);
-
-    // Add the attendance panel to the frame or a specific panel
-    panelCenter.add(panelAttendance, BorderLayout.NORTH);
-}
 
     private static void loadExistingEvents() {
         tableModel.setRowCount(0);
@@ -197,40 +175,113 @@ public class CodebytersAttendanceSystem {
         }
     }
 
-    private static void loadAttendanceData(String eventName) {
-        String[] attendanceColumnNames = {"Student ID", "Student Name", "Year Level", "Section"};
-        DefaultTableModel attendanceTableModel = new DefaultTableModel(null, attendanceColumnNames);
-        JTable attendanceTable = new JTable(attendanceTableModel);
-        attendanceTable.setFillsViewportHeight(true);
+private static void loadAttendanceData(String eventName) {
+    // Column names for the table
+    String[] attendanceColumnNames = {"Student ID", "Student Name", "Year Level", "Section"};
+    DefaultTableModel attendanceTableModel = new DefaultTableModel(null, attendanceColumnNames);
+    JTable attendanceTable = new JTable(attendanceTableModel);
+    attendanceTable.setFillsViewportHeight(true);
+    TableColumnModel columnModel = attendanceTable.getColumnModel();
 
-        File eventFile = new File(eventName + ".csv");
+    // Set preferred width for columns
+    columnModel.getColumn(0).setPreferredWidth(100);  // Student ID
+    columnModel.getColumn(1).setPreferredWidth(200);  // Student Name
+    columnModel.getColumn(2).setPreferredWidth(100);  // Year Level
+    columnModel.getColumn(3).setPreferredWidth(100);  // Section
 
-        if (eventFile.exists()) {
-            try (BufferedReader reader = new BufferedReader(new FileReader(eventFile))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    String[] studentData = line.split(",");
-                    attendanceTableModel.addRow(studentData);
+    // File path for event data (CSV)
+    File eventFile = new File(eventName + ".csv");
+
+    if (eventFile.exists()) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(eventFile))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] studentData = line.split(",");
+                attendanceTableModel.addRow(studentData);  // Add student row to table
+            }
+
+            JPanel attendancePanel = new JPanel(new BorderLayout());
+
+            // Create search panel with search bar
+            JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            JTextField searchField = new JTextField(30);
+            searchPanel.add(new JLabel("Search:"));
+            searchPanel.add(searchField);
+
+            // Add document listener to search bar for real-time filtering
+            searchField.getDocument().addDocumentListener(new DocumentListener() {
+                @Override
+                public void insertUpdate(DocumentEvent e) {
+                    filterTableData(attendanceTableModel, searchField.getText(), eventName);
                 }
 
-                JPanel attendancePanel = new JPanel(new BorderLayout());
-                JScrollPane attendanceScrollPane = new JScrollPane(attendanceTable);
-                attendanceScrollPane.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
-                attendancePanel.add(attendanceScrollPane, BorderLayout.CENTER);
+                @Override
+                public void removeUpdate(DocumentEvent e) {
+                    filterTableData(attendanceTableModel, searchField.getText(), eventName);
+                }
 
-                // Replace only the panelCenter content (keeping other parts of the frame intact)
-                panelCenter.removeAll();
-                panelCenter.add(attendancePanel, BorderLayout.CENTER);
-                panelCenter.revalidate();
-                panelCenter.repaint();
+                @Override
+                public void changedUpdate(DocumentEvent e) {
+                    filterTableData(attendanceTableModel, searchField.getText(), eventName);
+                }
+            });
 
-            } catch (IOException e) {
-                JOptionPane.showMessageDialog(null, "Error loading attendance data: " + e.getMessage());
+            // Add search bar panel to attendance panel
+            attendancePanel.add(searchPanel, BorderLayout.NORTH);
+
+            // Add scroll pane to the table
+            JScrollPane attendanceScrollPane = new JScrollPane(attendanceTable);
+            attendanceScrollPane.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
+            attendancePanel.add(attendanceScrollPane, BorderLayout.CENTER);
+
+            // Update main panel with new content
+            panelCenter.removeAll();
+            panelCenter.add(attendancePanel, BorderLayout.CENTER);
+            panelCenter.revalidate();
+            panelCenter.repaint();
+
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Error loading attendance data: " + e.getMessage());
+        }
+    } else {
+        JOptionPane.showMessageDialog(null, "Event file not found.");
+    }
+}
+
+private static void filterTableData(DefaultTableModel tableModel, String searchText, String eventName) {
+    // Clear the table rows first
+    tableModel.setRowCount(0);
+
+    // Return if the search text is empty
+    if (searchText.trim().isEmpty()) {
+        // Reload data without any filters if search is empty
+        loadAttendanceData(eventName);
+        return;
+    }
+
+    // File path for event data (CSV)
+    File eventFile = new File(eventName + ".csv");
+
+    if (eventFile.exists()) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(eventFile))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] studentData = line.split(",");
+                String studentId = studentData[0];
+                String studentName = studentData[1];
+
+                // Filter based on searchText matching ID or Name
+                if (studentId.contains(searchText) || studentName.contains(searchText)) {
+                    tableModel.addRow(studentData);  // Add matching row to table
+                }
             }
-        } else {
-            JOptionPane.showMessageDialog(null, "Event file not found.");
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Error filtering data: " + e.getMessage());
         }
     }
+}
+
+
 
     private static void enableCrudButtonsForStudents(String eventName) {
         // Clear existing buttons and add CRUD operations for selected event
@@ -519,6 +570,5 @@ public class CodebytersAttendanceSystem {
     updateStudentFrame.setLocationRelativeTo(null); // Center the window
     updateStudentFrame.setVisible(true);
 }
-    
 
 }
