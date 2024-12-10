@@ -34,7 +34,7 @@ public class LoginPageCodebytersAttendanceSystem {
         centerPanel.setPreferredSize(new Dimension(800,380));
         centerPanel.setBackground( Color.CYAN);
         
-        ImageIcon originalImageIcon2 = new ImageIcon("C:\\Users\\User\\Desktop\\CODEBYTERS GUI\\dorsu.jpg"); 
+        ImageIcon originalImageIcon2 = new ImageIcon("C:\\Users\\User\\Desktop\\CODEBYTERS GUI\\facet.png"); 
         Image image2 = originalImageIcon2.getImage(); 
         Image resizedImage2 = image2.getScaledInstance(800, 380, Image.SCALE_SMOOTH);
         ImageIcon resizedImageIcon2 = new ImageIcon(resizedImage2);

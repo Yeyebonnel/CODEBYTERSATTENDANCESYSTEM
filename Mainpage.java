@@ -1,184 +1,236 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package codebyters.attendance.system;
 
 import java.awt.*;
-    import java.awt.event.*;
-    import java.io.*;
-    import java.util.ArrayList;
-    import javax.swing.*;
-    import javax.swing.event.DocumentEvent;
-    import javax.swing.event.DocumentListener;
-    import javax.swing.table.DefaultTableModel;
-    import javax.swing.table.TableColumnModel;
+import java.awt.event.*;
+import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumnModel;
 
-  class Mainpage{
- private static JTable table;
-        private static DefaultTableModel tableModel;
-        private static JPanel panelCenter; 
-        private static JPanel panelWest; 
-        private static String currentEvent;
+class Mainpage{
+    
+    private static JTable table;
+    static DefaultTableModel tableModel;
+    private static JPanel panelCenter; 
+    static JPanel panelWest; 
+    private static String currentEvent;
+    
     void HomePage() {  
-
+        JFrame mainFrame = new JFrame("CODEBYTERS ATTENDANCE SYSTEM");
+        mainFrame.setSize(800, 550);
+        mainFrame.setLayout(new BorderLayout());
         
+        EventManager eventManager = new EventManager();
+
+
+        JPanel panelOne = new JPanel();
+        panelOne.setLayout(null); 
+        panelOne.setPreferredSize(new Dimension(800, 100));  
+        panelOne.setBackground(Color.black);
+        panelOne.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0)); 
+
+
+        ImageIcon originalImageIcon = new ImageIcon("C:\\Users\\User\\Desktop\\CODEBYTERS GUI\\ATTENDANCE SYSTEM.jpg"); 
+        Image image = originalImageIcon.getImage(); 
+        Image resizedImage = image.getScaledInstance(800, 100, Image.SCALE_FAST);
+        ImageIcon resizedImageIcon = new ImageIcon(resizedImage);
+        JLabel imageLabel = new JLabel(resizedImageIcon);
+        imageLabel.setBounds(0, 0, 800, 100);
+        panelOne.add(imageLabel);
+
+
+        panelWest = new JPanel();
+        panelWest.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));  
+        panelWest.setPreferredSize(new Dimension(150, 500));  
+        panelWest.setLayout(new BoxLayout(panelWest, BoxLayout.Y_AXIS)); 
+
+
+        JLabel dashboardLabel = new JLabel("DASHBOARD");
+        dashboardLabel.setFont(new Font("Arial", Font.BOLD, 16));  
+        dashboardLabel.setAlignmentX(Component.CENTER_ALIGNMENT);  
+        panelWest.add(dashboardLabel);  
+        panelWest.add(Box.createVerticalStrut(50));
+
+
+        JButton createEventbtn = new JButton("Create Event");
+        createEventbtn.setPreferredSize(new Dimension(120, 30));
+        createEventbtn.setMaximumSize(new Dimension(120, 30));
+        createEventbtn.setAlignmentX(Component.CENTER_ALIGNMENT);  
+        createEventbtn.setFocusPainted(false);
+        createEventbtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+         createEventbtn.addActionListener(e ->{
+            JFrame eventDetailsFrame = new JFrame("Event Details");
+            eventDetailsFrame.setSize(400, 225);
+            eventDetailsFrame.setLayout(null);
+            
+            JLabel eventNameLabel = new JLabel("Event Name:");
+            JTextField eventNameField = new JTextField(); 
+            eventNameField.setPreferredSize(new Dimension(200, 30));
+            eventNameLabel.setBounds(50, 30, 150, 25);
+            eventNameField.setBounds(200, 30, 150, 30);
+            
+            JLabel eventDateLabel = new JLabel("Date(YYYY-MM-DD):");
+            JTextField eventDateField = new JTextField();
+            eventDateField.setPreferredSize(new Dimension(200, 30));
+            eventDateLabel.setBounds(50, 80, 150, 25);
+            eventDateField.setBounds(200, 80, 150, 30);
+            
+            JButton submitButton = new JButton("Submit");
+            submitButton.setBounds(150, 130, 100, 30);
+            submitButton.setFocusPainted(false);
+       
+            submitButton.addActionListener(submitEvent -> {
+                String eventName = eventNameField.getText().trim();
+                String eventDate = eventDateField.getText().trim();
+                
+                if (eventName.isEmpty() || eventDate.isEmpty()) {
+                    JOptionPane.showMessageDialog(eventDetailsFrame, "Event Name and Date are required.");
+                    return;
+                }
+                
+                if (!eventDate.matches("\\d{4}-\\d{2}-\\d{2}")) {   //REGULAR EXPRESSION CHECK NA DAPAT DATE LANG SYA
+                    JOptionPane.showMessageDialog(eventDetailsFrame, "Invalid date format. Please use YYYY-MM-DD.");
+                    return;
+                }
+                eventDetailsFrame.dispose();
+                eventManager.createEventFile(eventName);
+  
+            });
+            
+            eventDetailsFrame.add(eventNameLabel);
+            eventDetailsFrame.add(eventNameField);
+            eventDetailsFrame.add(eventDateLabel);
+            eventDetailsFrame.add(eventDateField);
+            eventDetailsFrame.add(submitButton);
+            
+            eventDetailsFrame.setLocationRelativeTo(mainFrame);
+            
+            eventDetailsFrame.setResizable(false);
+            eventDetailsFrame.setVisible(true); 
         
-            JFrame mainFrame = new JFrame("CODEBYTERS ATTENDANCE SYSTEM");
-            mainFrame.setSize(800, 550);
-            mainFrame.setLayout(new BorderLayout());
+        });
+    
+    
+        panelWest.add(createEventbtn);
+        panelWest.add(Box.createVerticalStrut(15)); 
 
 
-            JPanel panelOne = new JPanel();
-            panelOne.setLayout(null); 
-            panelOne.setPreferredSize(new Dimension(800, 100));  
-            panelOne.setBackground(Color.black);
-            panelOne.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0)); 
+        JButton updatebtn = new JButton("Update Events");
+        updatebtn.setPreferredSize(new Dimension(120, 30)); 
+        updatebtn.setMaximumSize(new Dimension(120, 30));
+        updatebtn.setAlignmentX(Component.CENTER_ALIGNMENT);  
+        updatebtn.setFocusPainted(false);
+        updatebtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        //updatebtn.addActionListener(e -> loadExistingEvents());
+        panelWest.add(updatebtn);
+        panelWest.add(Box.createVerticalStrut(15));
+        
+        JButton deletebtn = new JButton("Delete Events");
+        deletebtn.setPreferredSize(new Dimension(120, 30)); 
+        deletebtn.setMaximumSize(new Dimension(120, 30));
+        deletebtn.setAlignmentX(Component.CENTER_ALIGNMENT);  
+        deletebtn.setFocusPainted(false);
+        deletebtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        //updatebtn.addActionListener(e -> loadExistingEvents());
+        panelWest.add(deletebtn);
+        panelWest.add(Box.createVerticalStrut(15));
 
 
-            ImageIcon originalImageIcon = new ImageIcon("C:\\Users\\User\\Desktop\\CODEBYTERS GUI\\ATTENDANCE SYSTEM.jpg"); 
-            Image image = originalImageIcon.getImage(); 
-            Image resizedImage = image.getScaledInstance(800, 100, Image.SCALE_FAST);
-            ImageIcon resizedImageIcon = new ImageIcon(resizedImage);
-            JLabel imageLabel = new JLabel(resizedImageIcon);
-            imageLabel.setBounds(0, 0, 800, 100);
-            panelOne.add(imageLabel);
+        JPanel panelTwo = new JPanel();
+        panelTwo.setLayout(null); 
+        panelTwo.setPreferredSize(new Dimension(800, 70));  
+        panelTwo.setBackground(Color.black);
+        panelTwo.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        ImageIcon originalImageIcon1 = new ImageIcon("C:\\Users\\User\\Desktop\\CODEBYTERS GUI\\IT2F.jpg"); 
+        Image image1 = originalImageIcon1.getImage(); 
+        Image resizedImage1 = image1.getScaledInstance(800, 70, Image.SCALE_FAST);
+        ImageIcon resizedImageIcon1 = new ImageIcon(resizedImage1);
+        JLabel imageLabel1 = new JLabel(resizedImageIcon1);
+        imageLabel1.setBounds(0, 0, 800, 70);
+        panelTwo.add(imageLabel1);
 
 
-            panelWest = new JPanel();
-            panelWest.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));  
-            panelWest.setPreferredSize(new Dimension(150, 500));  
-            panelWest.setLayout(new BoxLayout(panelWest, BoxLayout.Y_AXIS)); 
+        panelCenter = new JPanel();
+        panelCenter.setLayout(new BorderLayout());
+        panelCenter.setBackground(Color.CYAN);
+        panelCenter.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));  
 
 
-            JLabel dashboardLabel = new JLabel("DASHBOARD");
-            dashboardLabel.setFont(new Font("Arial", Font.BOLD, 16));  
-            dashboardLabel.setAlignmentX(Component.CENTER_ALIGNMENT);  
-            panelWest.add(dashboardLabel);  
-            panelWest.add(Box.createVerticalStrut(50));
+        JPanel tablePanel = new JPanel();
+        tablePanel.setBackground(Color.red);
+        tablePanel.setLayout(new BorderLayout()); 
 
-
-            JButton createEventbtn = new JButton("Create Event");
-            createEventbtn.setPreferredSize(new Dimension(120, 30));
-            createEventbtn.setMaximumSize(new Dimension(120, 30));
-            createEventbtn.setAlignmentX(Component.CENTER_ALIGNMENT);  
-            createEventbtn.setFocusPainted(false);
-            createEventbtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            createEventbtn.addActionListener(e -> {
-                String eventName = JOptionPane.showInputDialog(mainFrame, "Enter the Event Name:");
-                if (eventName != null && !eventName.trim().isEmpty()) {
-                    createEventFile(eventName);
+        // Define column names and create table model
+        String[] columnNames = {"Event Name","Date"};
+        tableModel = new DefaultTableModel(null, columnNames);
+        table = new JTable(tableModel);
+        table.setFillsViewportHeight(true);
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int row = table.getSelectedRow();
+                if (row >= 0) {
+                    currentEvent = (String) tableModel.getValueAt(row, 0);
+                    loadAttendanceData(currentEvent);
+                    enableCrudButtonsForStudents(currentEvent); // Enable CRUD buttons for students
                 }
-            });
-            panelWest.add(createEventbtn);
-            panelWest.add(Box.createVerticalStrut(15)); 
-
-
-            JButton viewbtn = new JButton("View Events");
-            viewbtn.setPreferredSize(new Dimension(120, 30)); 
-            viewbtn.setMaximumSize(new Dimension(120, 30));
-            viewbtn.setAlignmentX(Component.CENTER_ALIGNMENT);  
-            viewbtn.setFocusPainted(false);
-            viewbtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            viewbtn.addActionListener(e -> loadExistingEvents());
-            panelWest.add(viewbtn);
-            panelWest.add(Box.createVerticalStrut(15));
-
-
-            JPanel panelTwo = new JPanel();
-            panelTwo.setLayout(null); 
-            panelTwo.setPreferredSize(new Dimension(800, 70));  
-            panelTwo.setBackground(Color.black);
-            panelTwo.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-            ImageIcon originalImageIcon1 = new ImageIcon("C:\\Bonnel Jhon Files\\IT2F.jpg"); 
-            Image image1 = originalImageIcon1.getImage(); 
-            Image resizedImage1 = image1.getScaledInstance(800, 70, Image.SCALE_FAST);
-            ImageIcon resizedImageIcon1 = new ImageIcon(resizedImage1);
-            JLabel imageLabel1 = new JLabel(resizedImageIcon1);
-            imageLabel1.setBounds(0, 0, 800, 70);
-            panelTwo.add(imageLabel1);
-
-
-            panelCenter = new JPanel();
-            panelCenter.setLayout(new BorderLayout());
-            panelCenter.setBackground(Color.CYAN);
-            panelCenter.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));  
-
-
-            JPanel tablePanel = new JPanel();
-            tablePanel.setBackground(Color.red);
-            tablePanel.setLayout(new BorderLayout()); 
-
-            // Define column names and create table model
-            String[] columnNames = {"Event Name","Date"};
-            tableModel = new DefaultTableModel(null, columnNames);
-            table = new JTable(tableModel);
-            table.setFillsViewportHeight(true);
-            table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-            table.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    int row = table.getSelectedRow();
-                    if (row >= 0) {
-                        currentEvent = (String) tableModel.getValueAt(row, 0);
-                        loadAttendanceData(currentEvent);
-                        enableCrudButtonsForStudents(currentEvent); // Enable CRUD buttons for students
-                    }
-                }
-            });
-
-            JScrollPane scrollPane = new JScrollPane(table);
-            scrollPane.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));  // Border for the table
-            tablePanel.add(scrollPane, BorderLayout.CENTER);
-            panelCenter.add(tablePanel, BorderLayout.CENTER);
-
-            mainFrame.add(panelCenter, BorderLayout.CENTER);
-            mainFrame.add(panelWest, BorderLayout.WEST);
-            mainFrame.add(panelOne, BorderLayout.NORTH);
-            mainFrame.add(panelTwo, BorderLayout.SOUTH);
-            mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            mainFrame.setResizable(false);
-            mainFrame.setLocationRelativeTo(null); 
-            mainFrame.setVisible(true);
-
-            // Automatically load existing events when the application starts
-            loadExistingEvents(); // This is the key line that will automatically load events
-        }
-
-        private static void loadExistingEvents() {
-            tableModel.setRowCount(0);
-            File directory = new File(".");
-            File[] files = directory.listFiles((dir, name) -> name.endsWith(".csv"));
-
-            if (files != null && files.length > 0) {
-                for (File file : files) {
-                    tableModel.addRow(new Object[]{file.getName().replace(".csv", "")});
-                }
-            } else {
-                JOptionPane.showMessageDialog(null, "No events found.");
             }
-        }
+        });
+        
+        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
+        JTextField searchField = new JTextField(30);
+        searchPanel.add(new JLabel("Search:"));
+        searchPanel.add(searchField);
+        
+   
+        tablePanel.add(searchPanel, BorderLayout.NORTH);
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));  // Border for the table
+        tablePanel.add(scrollPane, BorderLayout.CENTER);
+        panelCenter.add(tablePanel, BorderLayout.CENTER);
+
+        mainFrame.add(panelCenter, BorderLayout.CENTER);
+        mainFrame.add(panelWest, BorderLayout.WEST);
+        mainFrame.add(panelOne, BorderLayout.NORTH);
+        mainFrame.add(panelTwo, BorderLayout.SOUTH);
+        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        mainFrame.setResizable(false);
+        mainFrame.setLocationRelativeTo(null); 
+        mainFrame.setVisible(true);
+
+        // Automatically load existing events when the application starts
+        eventManager.loadExistingEvents(); // This is the key line that will automatically load events
+    }
 
 
-        private static void createEventFile(String eventName) {
-            try {
-                File file = new File(eventName + ".csv");
 
-                if (file.exists()) {
-                    JOptionPane.showMessageDialog(null, "The file " + eventName + ".csv already exists.");
-                } else {
-                    boolean fileCreated = file.createNewFile();
-                    if (fileCreated) {
-                        JOptionPane.showMessageDialog(null, "Event created successfully with file: " + eventName + ".csv");
-                        tableModel.addRow(new Object[]{eventName});
-                    } else {
-                        JOptionPane.showMessageDialog(null, "Error creating the event file.");
-                    }
-                }
-            } catch (IOException e) {
-                JOptionPane.showMessageDialog(null, "Error creating the event file: " + e.getMessage());
-            }
-        }
+//private static void loadExistingEvents() {
+//    tableModel.setRowCount(0);
+//    File directory = new File(".");
+//    File[] files = directory.listFiles((dir, name) -> name.endsWith(".csv"));
+//
+//    if (files != null && files.length > 0) {
+//        for (File file : files) {
+//            // Get the last modified time
+//            long lastModified = file.lastModified();
+//            
+//            // Format the date as yyyy-MM-dd
+//            String formattedDate = new SimpleDateFormat("yyyy-MM-dd").format(new Date(lastModified));
+//            
+//            // Add file name and formatted date to the table
+//            tableModel.addRow(new Object[]{file.getName().replace(".csv", ""), formattedDate});
+//        }
+//    } else {
+//        JOptionPane.showMessageDialog(null, "No events found.");
+//    }
+//}
+
 
     private static void loadAttendanceData(String eventName) {
         // Column names for the table
