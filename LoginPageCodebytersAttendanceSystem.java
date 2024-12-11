@@ -1,11 +1,12 @@
-package codebyters.attendance.system;
+package codebytersattendancesystem;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Image;
+import java.awt.Toolkit;
 import javax.swing.*;
-import javax.swing.JOptionPane;
 
 public class LoginPageCodebytersAttendanceSystem {
 
@@ -14,6 +15,10 @@ public class LoginPageCodebytersAttendanceSystem {
         frame.setBackground(Color.black);
         frame.setSize(800, 550);
         frame.setLayout(new BorderLayout());
+        
+        Image icon = Toolkit.getDefaultToolkit().getImage("C:\\Bonnel Jhon Files\\codebyters_logo.png");
+        frame.setIconImage(icon);
+        
 
         JPanel firstPanel = new JPanel();
         firstPanel.setLayout(null);
@@ -21,7 +26,7 @@ public class LoginPageCodebytersAttendanceSystem {
         firstPanel.setBackground( Color.BLACK);
         firstPanel.setBorder(BorderFactory.createEmptyBorder(0,0,0,0));
         
-        ImageIcon originalImageIcon = new ImageIcon("C:\\Users\\User\\Desktop\\CODEBYTERS GUI\\ATTENDANCE SYSTEM.jpg"); 
+        ImageIcon originalImageIcon = new ImageIcon("C:\\Bonnel Jhon Files\\ATTENDANCE SYSTEM.jpg"); 
         Image image = originalImageIcon.getImage(); 
         Image resizedImage = image.getScaledInstance(800, 100, Image.SCALE_FAST);
         ImageIcon resizedImageIcon = new ImageIcon(resizedImage);
@@ -34,7 +39,7 @@ public class LoginPageCodebytersAttendanceSystem {
         centerPanel.setPreferredSize(new Dimension(800,380));
         centerPanel.setBackground( Color.CYAN);
         
-        ImageIcon originalImageIcon2 = new ImageIcon("C:\\Users\\User\\Desktop\\CODEBYTERS GUI\\facet.png"); 
+        ImageIcon originalImageIcon2 = new ImageIcon("C:\\Bonnel Jhon Files\\facet.png"); 
         Image image2 = originalImageIcon2.getImage(); 
         Image resizedImage2 = image2.getScaledInstance(800, 380, Image.SCALE_SMOOTH);
         ImageIcon resizedImageIcon2 = new ImageIcon(resizedImage2);
@@ -44,20 +49,20 @@ public class LoginPageCodebytersAttendanceSystem {
         JPanel loginPanel = new JPanel();
         loginPanel.setLayout(null);
         loginPanel.setBounds(250, 75, 300, 180);
-        loginPanel.setBackground(Color.GRAY);
+        loginPanel.setBackground(Color.CYAN);
    
         JLabel usernameLabel = new JLabel("Username:");
         JTextField usernameField = new JTextField();
         JLabel passwordLabel = new JLabel("Password:");
         JPasswordField passwordField = new JPasswordField();
         JButton loginButton = new JButton("Login");
-        loginButton.setBackground(Color.blue);
 
         usernameLabel.setBounds(30, 30, 80, 30);
         usernameField.setBounds(120, 30, 150, 30);
         passwordLabel.setBounds(30, 80, 80, 30);
         passwordField.setBounds(120, 80, 150, 30);
         loginButton.setBounds(120, 130, 100, 30);
+        loginButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         loginPanel.add(usernameLabel);
         loginPanel.add(usernameField);
@@ -86,7 +91,7 @@ public class LoginPageCodebytersAttendanceSystem {
         secondPanel.setPreferredSize(new Dimension(800, 70));  
         secondPanel.setBackground(Color.black);
         secondPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        ImageIcon originalImageIcon1 = new ImageIcon("C:\\Users\\User\\Desktop\\CODEBYTERS GUI\\IT2F.jpg");
+        ImageIcon originalImageIcon1 = new ImageIcon("C:\\Bonnel Jhon Files\\IT2F.jpg");
         Image image1 = originalImageIcon1.getImage(); 
         Image resizedImage1 = image1.getScaledInstance(800, 70, Image.SCALE_FAST);
         ImageIcon resizedImageIcon1 = new ImageIcon(resizedImage1);

@@ -1,29 +1,30 @@
-package codebyters.attendance.system;
+package codebytersattendancesystem;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.io.*;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableRowSorter;
 
 class Mainpage{
     
-    private static JTable table;
+    static JTable table;
     static DefaultTableModel tableModel;
-    private static JPanel panelCenter; 
+    static JPanel panelCenter; 
     static JPanel panelWest; 
-    private static String currentEvent;
     
     void HomePage() {  
+        
+        
         JFrame mainFrame = new JFrame("CODEBYTERS ATTENDANCE SYSTEM");
         mainFrame.setSize(800, 550);
         mainFrame.setLayout(new BorderLayout());
+        
+        Image icon = Toolkit.getDefaultToolkit().getImage("C:\\Bonnel Jhon Files\\codebyters_logo.png");
+        mainFrame.setIconImage(icon);
+        
         
         EventManager eventManager = new EventManager();
 
@@ -35,7 +36,7 @@ class Mainpage{
         panelOne.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0)); 
 
 
-        ImageIcon originalImageIcon = new ImageIcon("C:\\Users\\User\\Desktop\\CODEBYTERS GUI\\ATTENDANCE SYSTEM.jpg"); 
+        ImageIcon originalImageIcon = new ImageIcon("C:\\Bonnel Jhon Files\\ATTENDANCE SYSTEM.jpg"); 
         Image image = originalImageIcon.getImage(); 
         Image resizedImage = image.getScaledInstance(800, 100, Image.SCALE_FAST);
         ImageIcon resizedImageIcon = new ImageIcon(resizedImage);
@@ -46,7 +47,7 @@ class Mainpage{
 
         panelWest = new JPanel();
         panelWest.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));  
-        panelWest.setPreferredSize(new Dimension(150, 500));  
+        panelWest.setPreferredSize(new Dimension(180, 500));  
         panelWest.setLayout(new BoxLayout(panelWest, BoxLayout.Y_AXIS)); 
 
 
@@ -63,8 +64,12 @@ class Mainpage{
         createEventbtn.setAlignmentX(Component.CENTER_ALIGNMENT);  
         createEventbtn.setFocusPainted(false);
         createEventbtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-         createEventbtn.addActionListener(e ->{
+        createEventbtn.addActionListener(e ->{
             JFrame eventDetailsFrame = new JFrame("Event Details");
+            
+            Image icon1 = Toolkit.getDefaultToolkit().getImage("C:\\Bonnel Jhon Files\\codebyters_logo.png");
+            eventDetailsFrame.setIconImage(icon1);
+            
             eventDetailsFrame.setSize(400, 225);
             eventDetailsFrame.setLayout(null);
             
@@ -126,7 +131,7 @@ class Mainpage{
         updatebtn.setAlignmentX(Component.CENTER_ALIGNMENT);  
         updatebtn.setFocusPainted(false);
         updatebtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        //updatebtn.addActionListener(e -> loadExistingEvents());
+        updatebtn.addActionListener(e -> eventManager.updateEvent(table));
         panelWest.add(updatebtn);
         panelWest.add(Box.createVerticalStrut(15));
         
@@ -136,8 +141,30 @@ class Mainpage{
         deletebtn.setAlignmentX(Component.CENTER_ALIGNMENT);  
         deletebtn.setFocusPainted(false);
         deletebtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        //updatebtn.addActionListener(e -> loadExistingEvents());
+        deletebtn.addActionListener(e -> eventManager.deleteEvent(table));
         panelWest.add(deletebtn);
+        panelWest.add(Box.createVerticalStrut(50));
+        
+        JButton logoutbtn = new JButton("Logout");
+        logoutbtn.setPreferredSize(new Dimension(120, 30)); 
+        logoutbtn.setMaximumSize(new Dimension(120, 30));
+        logoutbtn.setAlignmentX(Component.CENTER_ALIGNMENT);  
+        logoutbtn.setFocusPainted(false);
+        logoutbtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        logoutbtn.addActionListener((ActionEvent e) -> {
+            int option = JOptionPane.showConfirmDialog(null, "Are you sure you want to logout?", "Logout", JOptionPane.YES_NO_OPTION);
+            if(option == JOptionPane.YES_OPTION){
+                mainFrame.dispose();
+                mainFrame.disable();
+                JFrame currentFrame = (JFrame) SwingUtilities.getWindowAncestor(logoutbtn);
+                currentFrame.setVisible(false);  // Hide the current frame
+                
+                // Show the Login Page by calling the main method of the LoginPageCodebytersAttendanceSystem class
+                // Assuming LoginPageCodebytersAttendanceSystem is a class with a main method to start the login page
+                LoginPageCodebytersAttendanceSystem.main(new String[0]);
+            }
+        });
+        panelWest.add(logoutbtn);
         panelWest.add(Box.createVerticalStrut(15));
 
 
@@ -146,7 +173,7 @@ class Mainpage{
         panelTwo.setPreferredSize(new Dimension(800, 70));  
         panelTwo.setBackground(Color.black);
         panelTwo.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        ImageIcon originalImageIcon1 = new ImageIcon("C:\\Users\\User\\Desktop\\CODEBYTERS GUI\\IT2F.jpg"); 
+        ImageIcon originalImageIcon1 = new ImageIcon("C:\\Bonnel Jhon Files\\IT2F.jpg"); 
         Image image1 = originalImageIcon1.getImage(); 
         Image resizedImage1 = image1.getScaledInstance(800, 70, Image.SCALE_FAST);
         ImageIcon resizedImageIcon1 = new ImageIcon(resizedImage1);
@@ -162,7 +189,6 @@ class Mainpage{
 
 
         JPanel tablePanel = new JPanel();
-        tablePanel.setBackground(Color.red);
         tablePanel.setLayout(new BorderLayout()); 
 
         // Define column names and create table model
@@ -171,23 +197,65 @@ class Mainpage{
         table = new JTable(tableModel);
         table.setFillsViewportHeight(true);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.clearSelection();
+        table.addMouseListener(new MouseAdapter() {
+            public boolean isCellEditable(int row, int column) {
+                return false; // Always prevent editing
+            }
+        });
         table.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                int row = table.getSelectedRow();
-                if (row >= 0) {
-                    currentEvent = (String) tableModel.getValueAt(row, 0);
-                    loadAttendanceData(currentEvent);
-                    enableCrudButtonsForStudents(currentEvent); // Enable CRUD buttons for students
+                if (e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON1) {
+                    int option = JOptionPane.showConfirmDialog(null, "OPEN FILE?", " ", JOptionPane.YES_NO_OPTION);
+                
+                    if(option == JOptionPane.YES_OPTION){
+                    
+                    int row = table.rowAtPoint(e.getPoint());
+                    String currentEvent = (String) tableModel.getValueAt(row, 0); // Assuming event name is in the first column
+                   
+                    eventManager.loadAttendanceData(currentEvent);
+                    eventManager.enableCrudButtonsForStudents(currentEvent);
+                    }
                 }
             }
         });
-        
-        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
+        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JTextField searchField = new JTextField(30);
+        
+//        String[] comboBoxOptions = {"All Events", "Event A", "Event B", "Event C"};
+//        JComboBox<String> comboBox = new JComboBox<>(comboBoxOptions);
+//        comboBox.setPreferredSize(new Dimension(150, 19));
+        
         searchPanel.add(new JLabel("Search:"));
         searchPanel.add(searchField);
+        //searchPanel.add(comboBox);
         
+        searchField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                searchEvents(searchField.getText());
+            }
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                searchEvents(searchField.getText());
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                searchEvents(searchField.getText());
+            }
+            
+            private void searchEvents(String searchText) {
+                TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(tableModel);
+                table.setRowSorter(sorter);
+                if (searchText.trim().length() == 0) {
+                    sorter.setRowFilter(null); // Show all rows if no text
+                } else {
+                    sorter.setRowFilter(RowFilter.regexFilter("(?i)" + searchText)); // Case insensitive search
+                }
+            }
+        });
    
         tablePanel.add(searchPanel, BorderLayout.NORTH);
         JScrollPane scrollPane = new JScrollPane(table);
@@ -204,429 +272,116 @@ class Mainpage{
         mainFrame.setLocationRelativeTo(null); 
         mainFrame.setVisible(true);
 
-        // Automatically load existing events when the application starts
         eventManager.loadExistingEvents(); // This is the key line that will automatically load events
     }
 
 
-
-//private static void loadExistingEvents() {
-//    tableModel.setRowCount(0);
-//    File directory = new File(".");
-//    File[] files = directory.listFiles((dir, name) -> name.endsWith(".csv"));
+//        private static void updateStudent(String eventName) {
 //
-//    if (files != null && files.length > 0) {
-//        for (File file : files) {
-//            // Get the last modified time
-//            long lastModified = file.lastModified();
-//            
-//            // Format the date as yyyy-MM-dd
-//            String formattedDate = new SimpleDateFormat("yyyy-MM-dd").format(new Date(lastModified));
-//            
-//            // Add file name and formatted date to the table
-//            tableModel.addRow(new Object[]{file.getName().replace(".csv", ""), formattedDate});
-//        }
-//    } else {
-//        JOptionPane.showMessageDialog(null, "No events found.");
+//        JFrame updateStudentFrame = new JFrame("Update Student");
+//        updateStudentFrame.setSize(400, 250);  
+//        updateStudentFrame.setLayout(new GridBagLayout()); 
+//        GridBagConstraints gbc = new GridBagConstraints();
+//
+//        gbc.insets = new Insets(10, 10, 10, 10);
+//
+//        JTextField studentIdField = new JTextField(20);
+//        JTextField studentNameField = new JTextField(20);
+//        JTextField yearLevelField = new JTextField(20);
+//        JTextField sectionField = new JTextField(20);
+//
+//        // Create labels for the fields
+//        JLabel studentIdLabel = new JLabel("Student ID:");
+//        JLabel studentNameLabel = new JLabel("New Student Name:");
+//        JLabel yearLevelLabel = new JLabel("New Year Level:");
+//        JLabel sectionLabel = new JLabel("New Section:");
+//
+//        gbc.gridx = 0; gbc.gridy = 0;
+//        updateStudentFrame.add(studentIdLabel, gbc);
+//        gbc.gridx = 1; gbc.gridy = 0;
+//        updateStudentFrame.add(studentIdField, gbc);
+//
+//        gbc.gridx = 0; gbc.gridy = 1;
+//        updateStudentFrame.add(studentNameLabel, gbc);
+//        gbc.gridx = 1; gbc.gridy = 1;
+//        updateStudentFrame.add(studentNameField, gbc);
+//
+//        gbc.gridx = 0; gbc.gridy = 2;
+//        updateStudentFrame.add(yearLevelLabel, gbc);
+//        gbc.gridx = 1; gbc.gridy = 2;
+//        updateStudentFrame.add(yearLevelField, gbc);
+//
+//        gbc.gridx = 0; gbc.gridy = 3;
+//        updateStudentFrame.add(sectionLabel, gbc);
+//        gbc.gridx = 1; gbc.gridy = 3;
+//        updateStudentFrame.add(sectionField, gbc);
+//
+//
+//        JButton updateButton = new JButton("Update");
+//        updateButton.setPreferredSize(new Dimension(100, 30));
+//        updateButton.setBackground(Color.BLUE); 
+//        updateButton.setForeground(Color.WHITE);
+//        updateButton.setFocusPainted(false);
+//        updateButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+//
+//
+//        gbc.gridx = 0; gbc.gridy = 4; gbc.gridwidth = 2;
+//        updateStudentFrame.add(updateButton, gbc);
+//
+//
+//        updateButton.addActionListener(e -> {
+//            String studentId = studentIdField.getText();
+//            String studentName = studentNameField.getText();
+//            String yearLevel = yearLevelField.getText();
+//            String section = sectionField.getText();
+//
+//            if (!studentId.isEmpty() && !studentName.isEmpty() && !yearLevel.isEmpty() && !section.isEmpty()) {
+//                try {
+//                    File eventFile = new File(eventName + ".csv");
+//                    BufferedReader reader = new BufferedReader(new FileReader(eventFile));
+//                    ArrayList<String> studentList = new ArrayList<>();
+//                    String line;
+//                    boolean studentFound = false;
+//
+//
+//                    while ((line = reader.readLine()) != null) {
+//                        studentList.add(line);
+//                    }
+//                    reader.close();
+//
+//                    for (int i = 0; i < studentList.size(); i++) {
+//                        String[] studentData = studentList.get(i).split(",");
+//                        if (studentData[0].equals(studentId)) {
+//                            studentList.set(i, studentId + "," + studentName + "," + yearLevel + "," + section);
+//                            studentFound = true;
+//                            break;
+//                        }
+//                    }
+//
+//                    if (!studentFound) {
+//                        JOptionPane.showMessageDialog(updateStudentFrame, "Student ID not found.");
+//                        return;
+//                    }
+//
+//
+//                    BufferedWriter writer = new BufferedWriter(new FileWriter(eventFile));
+//                    for (String student : studentList) {
+//                        writer.write(student + "\n");
+//                    }
+//                    writer.close();
+//                    loadAttendanceData(eventName); // Refresh the attendance table
+//                    updateStudentFrame.dispose();  // Close the update window after saving
+//
+//                } catch (IOException ex) {
+//                    JOptionPane.showMessageDialog(null, "Error updating student: " + ex.getMessage());
+//                }
+//            } else {
+//                JOptionPane.showMessageDialog(updateStudentFrame, "Please fill out all fields.");
+//            }
+//        });
+//        updateStudentFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+//        updateStudentFrame.setResizable(false);
+//        updateStudentFrame.setLocationRelativeTo(null); // Center the window
+//        updateStudentFrame.setVisible(true);
 //    }
-//}
-
-
-    private static void loadAttendanceData(String eventName) {
-        // Column names for the table
-        String[] attendanceColumnNames = {"Student ID", "Student Name", "Year Level", "Section"};
-        DefaultTableModel attendanceTableModel = new DefaultTableModel(null, attendanceColumnNames);
-        JTable attendanceTable = new JTable(attendanceTableModel);
-        attendanceTable.setFillsViewportHeight(true);
-        TableColumnModel columnModel = attendanceTable.getColumnModel();
-
-        // Set preferred width for columns
-        columnModel.getColumn(0).setPreferredWidth(100);  // Student ID
-        columnModel.getColumn(1).setPreferredWidth(200);  // Student Name
-        columnModel.getColumn(2).setPreferredWidth(100);  // Year Level
-        columnModel.getColumn(3).setPreferredWidth(100);  // Section
-
-        // File path for event data (CSV)
-        File eventFile = new File(eventName + ".csv");
-
-        if (eventFile.exists()) {
-            try (BufferedReader reader = new BufferedReader(new FileReader(eventFile))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    String[] studentData = line.split(",");
-                    attendanceTableModel.addRow(studentData);  // Add student row to table
-                }
-
-                JPanel attendancePanel = new JPanel(new BorderLayout());
-
-                // Create search panel with search bar
-                JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-                JTextField searchField = new JTextField(30);
-                searchPanel.add(new JLabel("Search:"));
-                searchPanel.add(searchField);
-
-                // Add document listener to search bar for real-time filtering
-                searchField.getDocument().addDocumentListener(new DocumentListener() {
-                    @Override
-                    public void insertUpdate(DocumentEvent e) {
-                        filterTableData(attendanceTableModel, searchField.getText(), eventName);
-                    }
-
-                    @Override
-                    public void removeUpdate(DocumentEvent e) {
-                        filterTableData(attendanceTableModel, searchField.getText(), eventName);
-                    }
-
-                    @Override
-                    public void changedUpdate(DocumentEvent e) {
-                        filterTableData(attendanceTableModel, searchField.getText(), eventName);
-                    }
-                });
-
-                // Add search bar panel to attendance panel
-                attendancePanel.add(searchPanel, BorderLayout.NORTH);
-
-                // Add scroll pane to the table
-                JScrollPane attendanceScrollPane = new JScrollPane(attendanceTable);
-                attendanceScrollPane.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
-                attendancePanel.add(attendanceScrollPane, BorderLayout.CENTER);
-
-                // Update main panel with new content
-                panelCenter.removeAll();
-                panelCenter.add(attendancePanel, BorderLayout.CENTER);
-                panelCenter.revalidate();
-                panelCenter.repaint();
-
-            } catch (IOException e) {
-                JOptionPane.showMessageDialog(null, "Error loading attendance data: " + e.getMessage());
-            }
-        } else {
-            JOptionPane.showMessageDialog(null, "Event file not found.");
-        }
-    }
-
-    private static void filterTableData(DefaultTableModel tableModel, String searchText, String eventName) {
-        // Clear the table rows first
-        tableModel.setRowCount(0);
-
-        // Return if the search text is empty
-        if (searchText.trim().isEmpty()) {
-            // Reload data without any filters if search is empty
-            loadAttendanceData(eventName);
-            return;
-        }
-
-        // File path for event data (CSV)
-        File eventFile = new File(eventName + ".csv");
-
-        if (eventFile.exists()) {
-            try (BufferedReader reader = new BufferedReader(new FileReader(eventFile))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    String[] studentData = line.split(",");
-                    String studentId = studentData[0];
-                    String studentName = studentData[1];
-
-                    // Filter based on searchText matching ID or Name
-                    if (studentId.contains(searchText) || studentName.contains(searchText)) {
-                        tableModel.addRow(studentData);  // Add matching row to table
-                    }
-                }
-            } catch (IOException e) {
-                JOptionPane.showMessageDialog(null, "Error filtering data: " + e.getMessage());
-            }
-        }
-    }
-
-
-
-        private static void enableCrudButtonsForStudents(String eventName) {
-            // Clear existing buttons and add CRUD operations for selected event
-            panelWest.removeAll();
-            panelWest.add(createCrudButtonsPanelForStudents(eventName)); 
-            panelWest.revalidate();
-            panelWest.repaint();
-        }
-
-        private static JPanel createCrudButtonsPanelForStudents(String eventName) {    
-        JPanel crudPanel = new JPanel();
-
-        crudPanel.setLayout(new BoxLayout(crudPanel, BoxLayout.Y_AXIS));
-        crudPanel.setBorder(BorderFactory.createEmptyBorder(8, 0, 0, 0));  
-        crudPanel.setPreferredSize(new Dimension(150, 500));
-
-        JLabel dashboardLabel = new JLabel("ATTENDANCE");
-        dashboardLabel.setFont(new Font("Arial", Font.BOLD, 16));  
-        dashboardLabel.setAlignmentX(Component.CENTER_ALIGNMENT);  
-        crudPanel.add(dashboardLabel);
-        crudPanel.add(Box.createVerticalStrut(20));
-
-        JButton createButton = new JButton("Add Student");
-        createButton.setPreferredSize(new Dimension(120, 30)); 
-        createButton.setMaximumSize(new Dimension(120, 30));
-        createButton.setAlignmentX(Component.CENTER_ALIGNMENT); 
-        createButton.setFocusPainted(false);
-        createButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        createButton.addActionListener(e -> addStudent(eventName));
-        crudPanel.add(createButton);
-        crudPanel.add(Box.createVerticalStrut(15));  // Add some vertical spacing
-
-        JButton readButton = new JButton("View Attendance");
-        readButton.setPreferredSize(new Dimension(120, 30)); 
-        readButton.setMaximumSize(new Dimension(120, 30));
-        readButton.setAlignmentX(Component.CENTER_ALIGNMENT);  
-        readButton.setFocusPainted(false);
-        readButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        readButton.addActionListener(e -> loadAttendanceData(eventName));
-        crudPanel.add(readButton);
-        crudPanel.add(Box.createVerticalStrut(15));  
-
-        // Create Delete Student button
-        JButton deleteButton = new JButton("Delete Student");
-        deleteButton.setPreferredSize(new Dimension(120, 30)); 
-        deleteButton.setMaximumSize(new Dimension(120, 30));
-        deleteButton.setAlignmentX(Component.CENTER_ALIGNMENT); 
-        deleteButton.setFocusPainted(false);
-        deleteButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        deleteButton.addActionListener(e -> deleteStudent(eventName));
-        crudPanel.add(deleteButton);
-        crudPanel.add(Box.createVerticalStrut(15));  
-
-        JButton updateButton = new JButton("Update Student");
-        updateButton.setPreferredSize(new Dimension(120, 30)); 
-        updateButton.setMaximumSize(new Dimension(120, 30));
-        updateButton.setAlignmentX(Component.CENTER_ALIGNMENT); 
-        updateButton.setFocusPainted(false);
-        updateButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        updateButton.addActionListener(e -> updateStudent(eventName));
-        crudPanel.add(updateButton);
-
-        return crudPanel;
-    }
-
-
-        private static void addStudent(String eventName) {
-        JFrame addStudentFrame = new JFrame("Add Student");
-        addStudentFrame.setSize(400, 250); 
-        addStudentFrame.setLayout(new GridBagLayout());  
-        GridBagConstraints gbc = new GridBagConstraints();
-
-        // Set up some padding
-        gbc.insets = new Insets(10, 10, 10, 10);
-
-        JTextField studentIdField = new JTextField(20);
-        JTextField studentNameField = new JTextField(20);
-        JTextField yearLevelField = new JTextField(20);
-        JTextField sectionField = new JTextField(20);
-
-
-        JLabel studentIdLabel = new JLabel("Student ID:");
-        JLabel studentNameLabel = new JLabel("Student Name:");
-        JLabel yearLevelLabel = new JLabel("Year Level:");
-        JLabel sectionLabel = new JLabel("Section:");
-
-        gbc.gridx = 0; gbc.gridy = 0;
-        addStudentFrame.add(studentIdLabel, gbc);
-        gbc.gridx = 1; gbc.gridy = 0;
-        addStudentFrame.add(studentIdField, gbc);
-
-        gbc.gridx = 0; gbc.gridy = 1;
-        addStudentFrame.add(studentNameLabel, gbc);
-        gbc.gridx = 1; gbc.gridy = 1;
-        addStudentFrame.add(studentNameField, gbc);
-
-        gbc.gridx = 0; gbc.gridy = 2;
-        addStudentFrame.add(yearLevelLabel, gbc);
-        gbc.gridx = 1; gbc.gridy = 2;
-        addStudentFrame.add(yearLevelField, gbc);
-
-        gbc.gridx = 0; gbc.gridy = 3;
-        addStudentFrame.add(sectionLabel, gbc);
-        gbc.gridx = 1; gbc.gridy = 3;
-        addStudentFrame.add(sectionField, gbc);
-
-        JButton saveButton = new JButton("Save");
-        saveButton.setPreferredSize(new Dimension(100, 30));
-        saveButton.setBackground(Color.BLUE); // Blue color for the button
-        saveButton.setForeground(Color.WHITE);
-        saveButton.setFocusPainted(false);
-        saveButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
-
-        gbc.gridx = 0; gbc.gridy = 4; gbc.gridwidth = 2;
-        addStudentFrame.add(saveButton, gbc);
-
-
-        saveButton.addActionListener(e -> {
-            String studentId = studentIdField.getText();
-            String studentName = studentNameField.getText();
-            String yearLevel = yearLevelField.getText();
-            String section = sectionField.getText();
-
-            if (!studentId.isEmpty() && !studentName.isEmpty() && !yearLevel.isEmpty() && !section.isEmpty()) {
-                try {
-                    File eventFile = new File(eventName + ".csv");
-                    BufferedWriter writer = new BufferedWriter(new FileWriter(eventFile, true));
-                    writer.append(studentId + "," + studentName + "," + yearLevel + "," + section + "\n");
-                    writer.close();
-                    loadAttendanceData(eventName); // Refresh the attendance table
-
-                    // Close the add student frame after saving
-                    addStudentFrame.dispose();
-                } catch (IOException ex) {
-                    JOptionPane.showMessageDialog(null, "Error adding student: " + ex.getMessage());
-                }
-            } else {
-                JOptionPane.showMessageDialog(addStudentFrame, "Please fill out all fields.");
-            }
-        });
-
-        // Set window properties
-        addStudentFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        addStudentFrame.setResizable(false);
-        addStudentFrame.setLocationRelativeTo(null); // Center the window
-        addStudentFrame.setVisible(true);
-    }
-
-
-        private static void deleteStudent(String eventName) {
-            try {
-                File eventFile = new File(eventName + ".csv");
-                BufferedReader reader = new BufferedReader(new FileReader(eventFile));
-                ArrayList<String> studentList = new ArrayList<>();
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    studentList.add(line);
-                }
-                reader.close();
-
-                String studentIdToDelete = JOptionPane.showInputDialog("Enter the Student ID to delete:");
-
-                // Remove the student with the given ID
-                studentList.removeIf(student -> student.split(",")[0].equals(studentIdToDelete));
-
-                // Rewrite the file without the deleted student
-                BufferedWriter writer = new BufferedWriter(new FileWriter(eventFile));
-                for (String student : studentList) {
-                    writer.write(student + "\n");
-                }
-                writer.close();
-                loadAttendanceData(eventName); // Refresh the attendance table
-            } catch (IOException e) {
-                JOptionPane.showMessageDialog(null, "Error deleting student: " + e.getMessage());
-            }
-        }
-
-        private static void updateStudent(String eventName) {
-
-        JFrame updateStudentFrame = new JFrame("Update Student");
-        updateStudentFrame.setSize(400, 250);  
-        updateStudentFrame.setLayout(new GridBagLayout()); 
-        GridBagConstraints gbc = new GridBagConstraints();
-
-        gbc.insets = new Insets(10, 10, 10, 10);
-
-        JTextField studentIdField = new JTextField(20);
-        JTextField studentNameField = new JTextField(20);
-        JTextField yearLevelField = new JTextField(20);
-        JTextField sectionField = new JTextField(20);
-
-        // Create labels for the fields
-        JLabel studentIdLabel = new JLabel("Student ID:");
-        JLabel studentNameLabel = new JLabel("New Student Name:");
-        JLabel yearLevelLabel = new JLabel("New Year Level:");
-        JLabel sectionLabel = new JLabel("New Section:");
-
-        gbc.gridx = 0; gbc.gridy = 0;
-        updateStudentFrame.add(studentIdLabel, gbc);
-        gbc.gridx = 1; gbc.gridy = 0;
-        updateStudentFrame.add(studentIdField, gbc);
-
-        gbc.gridx = 0; gbc.gridy = 1;
-        updateStudentFrame.add(studentNameLabel, gbc);
-        gbc.gridx = 1; gbc.gridy = 1;
-        updateStudentFrame.add(studentNameField, gbc);
-
-        gbc.gridx = 0; gbc.gridy = 2;
-        updateStudentFrame.add(yearLevelLabel, gbc);
-        gbc.gridx = 1; gbc.gridy = 2;
-        updateStudentFrame.add(yearLevelField, gbc);
-
-        gbc.gridx = 0; gbc.gridy = 3;
-        updateStudentFrame.add(sectionLabel, gbc);
-        gbc.gridx = 1; gbc.gridy = 3;
-        updateStudentFrame.add(sectionField, gbc);
-
-
-        JButton updateButton = new JButton("Update");
-        updateButton.setPreferredSize(new Dimension(100, 30));
-        updateButton.setBackground(Color.BLUE); 
-        updateButton.setForeground(Color.WHITE);
-        updateButton.setFocusPainted(false);
-        updateButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
-
-        gbc.gridx = 0; gbc.gridy = 4; gbc.gridwidth = 2;
-        updateStudentFrame.add(updateButton, gbc);
-
-
-        updateButton.addActionListener(e -> {
-            String studentId = studentIdField.getText();
-            String studentName = studentNameField.getText();
-            String yearLevel = yearLevelField.getText();
-            String section = sectionField.getText();
-
-            if (!studentId.isEmpty() && !studentName.isEmpty() && !yearLevel.isEmpty() && !section.isEmpty()) {
-                try {
-                    File eventFile = new File(eventName + ".csv");
-                    BufferedReader reader = new BufferedReader(new FileReader(eventFile));
-                    ArrayList<String> studentList = new ArrayList<>();
-                    String line;
-                    boolean studentFound = false;
-
-
-                    while ((line = reader.readLine()) != null) {
-                        studentList.add(line);
-                    }
-                    reader.close();
-
-                    for (int i = 0; i < studentList.size(); i++) {
-                        String[] studentData = studentList.get(i).split(",");
-                        if (studentData[0].equals(studentId)) {
-                            studentList.set(i, studentId + "," + studentName + "," + yearLevel + "," + section);
-                            studentFound = true;
-                            break;
-                        }
-                    }
-
-                    if (!studentFound) {
-                        JOptionPane.showMessageDialog(updateStudentFrame, "Student ID not found.");
-                        return;
-                    }
-
-
-                    BufferedWriter writer = new BufferedWriter(new FileWriter(eventFile));
-                    for (String student : studentList) {
-                        writer.write(student + "\n");
-                    }
-                    writer.close();
-                    loadAttendanceData(eventName); // Refresh the attendance table
-                    updateStudentFrame.dispose();  // Close the update window after saving
-
-                } catch (IOException ex) {
-                    JOptionPane.showMessageDialog(null, "Error updating student: " + ex.getMessage());
-                }
-            } else {
-                JOptionPane.showMessageDialog(updateStudentFrame, "Please fill out all fields.");
-            }
-        });
-
-        // Set window properties
-        updateStudentFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        updateStudentFrame.setResizable(false);
-        updateStudentFrame.setLocationRelativeTo(null); // Center the window
-        updateStudentFrame.setVisible(true);
-    }
-
-    }
-    
+}  
