@@ -72,16 +72,16 @@ public class LoginPageCodebytersAttendanceSystem {
         loginButton.addActionListener(e -> {
             String username = usernameField.getText();
             char[] password = passwordField.getPassword();
-//            if (username.equals("ADMIN") && String.valueOf(password).equals("pass")) {
-//                JOptionPane.showMessageDialog(frame, "Login Successful");
-                frame.dispose();
-                frame.disable();
-                Mainpage main = new Mainpage();
-                main.HomePage();
-//            } else {
-//                JOptionPane.showMessageDialog(frame, "Invalid Username or Password", "Error", JOptionPane.ERROR_MESSAGE);
-//            }
-      });
+            if (username.equals("ADMIN") && String.valueOf(password).equals("pass")) {
+                 JOptionPane.showMessageDialog(frame, "Login Successful");
+                 frame.dispose();
+                 frame.disable();
+                 Mainpage main = new Mainpage();
+                 main.HomePage();
+             } else {
+                JOptionPane.showMessageDialog(frame, "Invalid Username or Password", "Error", JOptionPane.ERROR_MESSAGE);
+             }
+       });
         centerPanel.add(loginPanel);
         centerPanel.add(imageLabel2);
         

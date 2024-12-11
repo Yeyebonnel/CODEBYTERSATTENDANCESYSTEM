@@ -14,6 +14,13 @@ class Mainpage{
     static DefaultTableModel tableModel;
     static JPanel panelCenter; 
     static JPanel panelWest; 
+    static JLabel dashboardLabel;
+    static JPanel searchPanel;
+    static JTextField searchField ;
+    static JButton createEventbtn;
+    static JButton updatebtn;
+    static JButton deletebtn;
+    static JButton logoutbtn;
     
     void HomePage() {  
         
@@ -51,14 +58,14 @@ class Mainpage{
         panelWest.setLayout(new BoxLayout(panelWest, BoxLayout.Y_AXIS)); 
 
 
-        JLabel dashboardLabel = new JLabel("DASHBOARD");
+        dashboardLabel = new JLabel("DASHBOARD");
         dashboardLabel.setFont(new Font("Arial", Font.BOLD, 16));  
         dashboardLabel.setAlignmentX(Component.CENTER_ALIGNMENT);  
         panelWest.add(dashboardLabel);  
         panelWest.add(Box.createVerticalStrut(50));
 
 
-        JButton createEventbtn = new JButton("Create Event");
+        createEventbtn = new JButton("Create Event");
         createEventbtn.setPreferredSize(new Dimension(120, 30));
         createEventbtn.setMaximumSize(new Dimension(120, 30));
         createEventbtn.setAlignmentX(Component.CENTER_ALIGNMENT);  
@@ -125,7 +132,7 @@ class Mainpage{
         panelWest.add(Box.createVerticalStrut(15)); 
 
 
-        JButton updatebtn = new JButton("Update Events");
+        updatebtn = new JButton("Update Events");
         updatebtn.setPreferredSize(new Dimension(120, 30)); 
         updatebtn.setMaximumSize(new Dimension(120, 30));
         updatebtn.setAlignmentX(Component.CENTER_ALIGNMENT);  
@@ -135,7 +142,7 @@ class Mainpage{
         panelWest.add(updatebtn);
         panelWest.add(Box.createVerticalStrut(15));
         
-        JButton deletebtn = new JButton("Delete Events");
+        deletebtn = new JButton("Delete Events");
         deletebtn.setPreferredSize(new Dimension(120, 30)); 
         deletebtn.setMaximumSize(new Dimension(120, 30));
         deletebtn.setAlignmentX(Component.CENTER_ALIGNMENT);  
@@ -145,7 +152,7 @@ class Mainpage{
         panelWest.add(deletebtn);
         panelWest.add(Box.createVerticalStrut(50));
         
-        JButton logoutbtn = new JButton("Logout");
+        logoutbtn = new JButton("Logout");
         logoutbtn.setPreferredSize(new Dimension(120, 30)); 
         logoutbtn.setMaximumSize(new Dimension(120, 30));
         logoutbtn.setAlignmentX(Component.CENTER_ALIGNMENT);  
@@ -220,8 +227,8 @@ class Mainpage{
                 }
             }
         });
-        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JTextField searchField = new JTextField(30);
+        searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        searchField = new JTextField(30);
         
 //        String[] comboBoxOptions = {"All Events", "Event A", "Event B", "Event C"};
 //        JComboBox<String> comboBox = new JComboBox<>(comboBoxOptions);
@@ -274,114 +281,4 @@ class Mainpage{
 
         eventManager.loadExistingEvents(); // This is the key line that will automatically load events
     }
-
-
-//        private static void updateStudent(String eventName) {
-//
-//        JFrame updateStudentFrame = new JFrame("Update Student");
-//        updateStudentFrame.setSize(400, 250);  
-//        updateStudentFrame.setLayout(new GridBagLayout()); 
-//        GridBagConstraints gbc = new GridBagConstraints();
-//
-//        gbc.insets = new Insets(10, 10, 10, 10);
-//
-//        JTextField studentIdField = new JTextField(20);
-//        JTextField studentNameField = new JTextField(20);
-//        JTextField yearLevelField = new JTextField(20);
-//        JTextField sectionField = new JTextField(20);
-//
-//        // Create labels for the fields
-//        JLabel studentIdLabel = new JLabel("Student ID:");
-//        JLabel studentNameLabel = new JLabel("New Student Name:");
-//        JLabel yearLevelLabel = new JLabel("New Year Level:");
-//        JLabel sectionLabel = new JLabel("New Section:");
-//
-//        gbc.gridx = 0; gbc.gridy = 0;
-//        updateStudentFrame.add(studentIdLabel, gbc);
-//        gbc.gridx = 1; gbc.gridy = 0;
-//        updateStudentFrame.add(studentIdField, gbc);
-//
-//        gbc.gridx = 0; gbc.gridy = 1;
-//        updateStudentFrame.add(studentNameLabel, gbc);
-//        gbc.gridx = 1; gbc.gridy = 1;
-//        updateStudentFrame.add(studentNameField, gbc);
-//
-//        gbc.gridx = 0; gbc.gridy = 2;
-//        updateStudentFrame.add(yearLevelLabel, gbc);
-//        gbc.gridx = 1; gbc.gridy = 2;
-//        updateStudentFrame.add(yearLevelField, gbc);
-//
-//        gbc.gridx = 0; gbc.gridy = 3;
-//        updateStudentFrame.add(sectionLabel, gbc);
-//        gbc.gridx = 1; gbc.gridy = 3;
-//        updateStudentFrame.add(sectionField, gbc);
-//
-//
-//        JButton updateButton = new JButton("Update");
-//        updateButton.setPreferredSize(new Dimension(100, 30));
-//        updateButton.setBackground(Color.BLUE); 
-//        updateButton.setForeground(Color.WHITE);
-//        updateButton.setFocusPainted(false);
-//        updateButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-//
-//
-//        gbc.gridx = 0; gbc.gridy = 4; gbc.gridwidth = 2;
-//        updateStudentFrame.add(updateButton, gbc);
-//
-//
-//        updateButton.addActionListener(e -> {
-//            String studentId = studentIdField.getText();
-//            String studentName = studentNameField.getText();
-//            String yearLevel = yearLevelField.getText();
-//            String section = sectionField.getText();
-//
-//            if (!studentId.isEmpty() && !studentName.isEmpty() && !yearLevel.isEmpty() && !section.isEmpty()) {
-//                try {
-//                    File eventFile = new File(eventName + ".csv");
-//                    BufferedReader reader = new BufferedReader(new FileReader(eventFile));
-//                    ArrayList<String> studentList = new ArrayList<>();
-//                    String line;
-//                    boolean studentFound = false;
-//
-//
-//                    while ((line = reader.readLine()) != null) {
-//                        studentList.add(line);
-//                    }
-//                    reader.close();
-//
-//                    for (int i = 0; i < studentList.size(); i++) {
-//                        String[] studentData = studentList.get(i).split(",");
-//                        if (studentData[0].equals(studentId)) {
-//                            studentList.set(i, studentId + "," + studentName + "," + yearLevel + "," + section);
-//                            studentFound = true;
-//                            break;
-//                        }
-//                    }
-//
-//                    if (!studentFound) {
-//                        JOptionPane.showMessageDialog(updateStudentFrame, "Student ID not found.");
-//                        return;
-//                    }
-//
-//
-//                    BufferedWriter writer = new BufferedWriter(new FileWriter(eventFile));
-//                    for (String student : studentList) {
-//                        writer.write(student + "\n");
-//                    }
-//                    writer.close();
-//                    loadAttendanceData(eventName); // Refresh the attendance table
-//                    updateStudentFrame.dispose();  // Close the update window after saving
-//
-//                } catch (IOException ex) {
-//                    JOptionPane.showMessageDialog(null, "Error updating student: " + ex.getMessage());
-//                }
-//            } else {
-//                JOptionPane.showMessageDialog(updateStudentFrame, "Please fill out all fields.");
-//            }
-//        });
-//        updateStudentFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-//        updateStudentFrame.setResizable(false);
-//        updateStudentFrame.setLocationRelativeTo(null); // Center the window
-//        updateStudentFrame.setVisible(true);
-//    }
-}  
+} 

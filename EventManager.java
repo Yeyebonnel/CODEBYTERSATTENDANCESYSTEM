@@ -1,7 +1,16 @@
 package codebytersattendancesystem;
 
+import static codebytersattendancesystem.Mainpage.createEventbtn;
+import static codebytersattendancesystem.Mainpage.dashboardLabel;
+import static codebytersattendancesystem.Mainpage.deletebtn;
+import static codebytersattendancesystem.Mainpage.logoutbtn;
 import static codebytersattendancesystem.Mainpage.tableModel;
 import static codebytersattendancesystem.Mainpage.panelCenter;
+import static codebytersattendancesystem.Mainpage.panelWest;
+import static codebytersattendancesystem.Mainpage.searchPanel;
+import static codebytersattendancesystem.Mainpage.table;
+import static codebytersattendancesystem.Mainpage.tableModel;
+import static codebytersattendancesystem.Mainpage.updatebtn;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -14,6 +23,7 @@ import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
 import javax.swing.table.DefaultTableModel;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -32,11 +42,10 @@ import javax.swing.JOptionPane;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableRowSorter;
 
 
 class EventManager{
-
-    private static JPanel panelWest;
     
     void createEventFile(String eventName) {
         
@@ -297,146 +306,267 @@ class EventManager{
         updateButton.setFont(new Font("ARIAL", Font.BOLD, 11));
         updateButton.addActionListener(e -> updateStudent(eventName));
         crudPanel.add(updateButton);
+        crudPanel.add(Box.createVerticalStrut(35));
+
+        JButton backbtn = new JButton("Back");
+        backbtn.setPreferredSize(new Dimension(120,30));
+        backbtn.setMaximumSize(new Dimension(120, 30));
+        backbtn.setAlignmentX(Component.CENTER_ALIGNMENT); 
+        backbtn.setFocusPainted(false);
+        backbtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        backbtn.addActionListener((ActionEvent e) -> {
+            EventManager eventManager = new EventManager();
+            eventManager.loadExistingEvents();  // Reload events in the table
+
+            // Create the panel to display the events and the search bar
+            JPanel eventsPanel = new JPanel(new BorderLayout());
+
+            // Create the search panel with the search field
+            JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            JTextField searchField = new JTextField(30);
+            searchPanel.add(new JLabel("Search:"));
+            searchPanel.add(searchField);
+
+            // Add document listener for real-time filtering
+            searchField.getDocument().addDocumentListener(new DocumentListener() {
+                @Override
+                public void insertUpdate(DocumentEvent e) {
+                    searchEvents(tableModel, searchField.getText());
+                }
+
+                @Override
+                public void removeUpdate(DocumentEvent e) {
+                    searchEvents(tableModel, searchField.getText());
+                }
+
+                @Override
+                public void changedUpdate(DocumentEvent e) {
+                    searchEvents(tableModel, searchField.getText());
+                }
+                private void searchEvents(DefaultTableModel tableModel, String searchText) {
+                TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(tableModel);
+                table.setRowSorter(sorter);
+                if (searchText.trim().length() == 0) {
+                    sorter.setRowFilter(null); // Show all rows if no text
+                } else {
+                    sorter.setRowFilter(RowFilter.regexFilter("(?i)" + searchText)); // Case insensitive search
+                }
+            }
+            });
+
+            // Add the search panel to the events panel
+            eventsPanel.add(searchPanel, BorderLayout.NORTH);
+
+            // Add the scrollable table to the center of the events panel
+            JScrollPane scrollPane = new JScrollPane(table);
+            scrollPane.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
+            eventsPanel.add(scrollPane, BorderLayout.CENTER);
+            
+            
+            panelCenter.removeAll();  // Clear the current panel
+            panelCenter.add(eventsPanel, BorderLayout.CENTER);
+            panelCenter.revalidate();
+            panelCenter.repaint();
+            
+            panelWest.removeAll();
+            panelWest.add(dashboardLabel);
+            panelWest.add(Box.createVerticalStrut(50));
+            panelWest.add(createEventbtn);
+            panelWest.add(Box.createVerticalStrut(15));
+            panelWest.add(updatebtn);
+            panelWest.add(Box.createVerticalStrut(15));
+            panelWest.add(deletebtn);
+            panelWest.add(Box.createVerticalStrut(50));
+            panelWest.add(logoutbtn);
+    
+            panelWest.revalidate();
+            panelWest.repaint();
+        });
+        crudPanel.add(backbtn);
+        crudPanel.add(Box.createVerticalStrut(15));
+        
+        JButton logoutbtn = new JButton("Logout");
+        logoutbtn.setPreferredSize(new Dimension(120,30));
+        logoutbtn.setMaximumSize(new Dimension(120, 30));
+        logoutbtn.setAlignmentX(Component.CENTER_ALIGNMENT); 
+        logoutbtn.setFocusPainted(false);
+        logoutbtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        logoutbtn.addActionListener((ActionEvent e) -> {
+            int option = JOptionPane.showConfirmDialog(null, "Are you sure you want to logout?", "Logout", JOptionPane.YES_NO_OPTION);
+            if(option == JOptionPane.YES_OPTION){
+                
+                JFrame currentFrame = (JFrame) SwingUtilities.getWindowAncestor(logoutbtn);
+                currentFrame.setVisible(false);  // Hide the current frame
+                
+                // Show the Login Page by calling the main method of the LoginPageCodebytersAttendanceSystem class
+                // Assuming LoginPageCodebytersAttendanceSystem is a class with a main method to start the login page
+                LoginPageCodebytersAttendanceSystem.main(new String[0]);
+            }
+        });
+        crudPanel.add(logoutbtn);
+        
 
         return crudPanel;
     }
 
     private void addStudent(String eventName) {
-    JFrame addStudentFrame = new JFrame("Add Student");
-    
-    Image icon = Toolkit.getDefaultToolkit().getImage("C:\\Bonnel Jhon Files\\codebyters_logo.png");
-    addStudentFrame.setIconImage(icon);
-    
-    addStudentFrame.setSize(400, 250); 
-    addStudentFrame.setLayout(new GridBagLayout());  
-    GridBagConstraints gbc = new GridBagConstraints();
-    
-    gbc.insets = new Insets(10, 10, 10, 10);
-    
-    JTextField studentIdField = new JTextField(20);
-    JTextField studentNameField = new JTextField(20);
-    JTextField yearLevelField = new JTextField(20);
-    JTextField sectionField = new JTextField(20);
-    
-    JLabel studentIdLabel = new JLabel("Student ID:");
-    JLabel studentNameLabel = new JLabel("Student Name:");
-    JLabel yearLevelLabel = new JLabel("Year Level:");
-    JLabel sectionLabel = new JLabel("Section:");
+        JFrame addStudentFrame = new JFrame("Add Student");
 
-    gbc.gridx = 0; gbc.gridy = 0;
-    addStudentFrame.add(studentIdLabel, gbc);
-    gbc.gridx = 1; gbc.gridy = 0;
-    addStudentFrame.add(studentIdField, gbc);
+        Image icon = Toolkit.getDefaultToolkit().getImage("C:\\Bonnel Jhon Files\\codebyters_logo.png");
+        addStudentFrame.setIconImage(icon);
 
-    gbc.gridx = 0; gbc.gridy = 1;
-    addStudentFrame.add(studentNameLabel, gbc);
-    gbc.gridx = 1; gbc.gridy = 1;
-    addStudentFrame.add(studentNameField, gbc);
+        addStudentFrame.setSize(400, 250); 
+        addStudentFrame.setLayout(new GridBagLayout());  
+        GridBagConstraints gbc = new GridBagConstraints();
 
-    gbc.gridx = 0; gbc.gridy = 2;
-    addStudentFrame.add(yearLevelLabel, gbc);
-    gbc.gridx = 1; gbc.gridy = 2;
-    addStudentFrame.add(yearLevelField, gbc);
+        gbc.insets = new Insets(10, 10, 10, 10);
 
-    gbc.gridx = 0; gbc.gridy = 3;
-    addStudentFrame.add(sectionLabel, gbc);
-    gbc.gridx = 1; gbc.gridy = 3;
-    addStudentFrame.add(sectionField, gbc);
+        JTextField studentIdField = new JTextField(20);
+        JTextField studentNameField = new JTextField(20);
+        JTextField yearLevelField = new JTextField(20);
+        JTextField sectionField = new JTextField(20);
 
-    JButton saveButton = new JButton("Save");
-    saveButton.setPreferredSize(new Dimension(100, 30));
-    saveButton.setBackground(Color.BLUE); // Blue color for the button
-    saveButton.setForeground(Color.WHITE);
-    saveButton.setFocusPainted(false);
-    saveButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        JLabel studentIdLabel = new JLabel("Student ID:");
+        JLabel studentNameLabel = new JLabel("Student Name:");
+        JLabel yearLevelLabel = new JLabel("Year Level:");
+        JLabel sectionLabel = new JLabel("Section:");
 
-    gbc.gridx = 0; gbc.gridy = 4; gbc.gridwidth = 2;
-    addStudentFrame.add(saveButton, gbc);
-    
-    saveButton.addActionListener(e -> {
-        String studentId = studentIdField.getText();
-        String studentName = studentNameField.getText();
-        String yearLevel = yearLevelField.getText();
-        String section = sectionField.getText();
-        
-        if(!studentId.matches("^\\d{4}-\\d{4}$")){
-            JOptionPane.showMessageDialog(null, "Invalid ID format");
-            return;
-        }
-        
-        if (!studentId.isEmpty() && !studentName.isEmpty() && !yearLevel.isEmpty() && !section.isEmpty()) {
-            try {
-                File eventFile = new File(eventName + ".csv");
-                if (!eventFile.exists()) {
-                    JOptionPane.showMessageDialog(null, "Event file not found.");
-                    return;
-                }
+        gbc.gridx = 0; gbc.gridy = 0;
+        addStudentFrame.add(studentIdLabel, gbc);
+        gbc.gridx = 1; gbc.gridy = 0;
+        addStudentFrame.add(studentIdField, gbc);
 
-                // Check for duplicate student
-                try (BufferedReader reader = new BufferedReader(new FileReader(eventFile))) {
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        String[] studentData = line.split(",");
-                        if (studentData[0].equals(studentId)) {
-                            JOptionPane.showMessageDialog(null, "Student ID already exists.");
-                            return;
+        gbc.gridx = 0; gbc.gridy = 1;
+        addStudentFrame.add(studentNameLabel, gbc);
+        gbc.gridx = 1; gbc.gridy = 1;
+        addStudentFrame.add(studentNameField, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 2;
+        addStudentFrame.add(yearLevelLabel, gbc);
+        gbc.gridx = 1; gbc.gridy = 2;
+        addStudentFrame.add(yearLevelField, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 3;
+        addStudentFrame.add(sectionLabel, gbc);
+        gbc.gridx = 1; gbc.gridy = 3;
+        addStudentFrame.add(sectionField, gbc);
+
+        JButton saveButton = new JButton("Save");
+        saveButton.setPreferredSize(new Dimension(100, 30));
+        saveButton.setBackground(Color.BLUE); // Blue color for the button
+        saveButton.setForeground(Color.WHITE);
+        saveButton.setFocusPainted(false);
+        saveButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        gbc.gridx = 0; gbc.gridy = 4; gbc.gridwidth = 2;
+        addStudentFrame.add(saveButton, gbc);
+
+        saveButton.addActionListener(e -> {
+            String studentId = studentIdField.getText();
+            String studentName = studentNameField.getText();
+            String yearLevel = yearLevelField.getText();
+            String section = sectionField.getText();
+
+            if(!studentId.matches("^\\d{4}-\\d{4}$")){
+                JOptionPane.showMessageDialog(null, "Invalid ID format");
+                return;
+            }
+
+            if (!studentId.isEmpty() && !studentName.isEmpty() && !yearLevel.isEmpty() && !section.isEmpty()) {
+                try {
+                    File eventFile = new File(eventName + ".csv");
+                    if (!eventFile.exists()) {
+                        JOptionPane.showMessageDialog(null, "Event file not found.");
+                        return;
+                    }
+
+                    // Check for duplicate student
+                    try (BufferedReader reader = new BufferedReader(new FileReader(eventFile))) {
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+                            String[] studentData = line.split(",");
+                            if (studentData[0].equals(studentId)) {
+                                JOptionPane.showMessageDialog(null, "Student ID already exists.");
+                                return;
+                            }
                         }
                     }
+
+                    // Add student to file
+                    try (BufferedWriter writer = new BufferedWriter(new FileWriter(eventFile, true))) {
+                        writer.append(studentId + "," + studentName + "," + yearLevel + "," + section + "\n");
+                    }
+
+                    // Refresh table
+                    loadAttendanceData(eventName);
+
+                    // Close the add student frame after saving
+                    addStudentFrame.dispose();
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(null, "Error adding student: " + ex.getMessage());
                 }
-
-                // Add student to file
-                try (BufferedWriter writer = new BufferedWriter(new FileWriter(eventFile, true))) {
-                    writer.append(studentId + "," + studentName + "," + yearLevel + "," + section + "\n");
-                }
-
-                // Refresh table
-                loadAttendanceData(eventName);
-
-                // Close the add student frame after saving
-                addStudentFrame.dispose();
-            } catch (IOException ex) {
-                JOptionPane.showMessageDialog(null, "Error adding student: " + ex.getMessage());
+            } else {
+                JOptionPane.showMessageDialog(addStudentFrame, "Please fill out all fields.");
             }
-        } else {
-            JOptionPane.showMessageDialog(addStudentFrame, "Please fill out all fields.");
+        });
+
+        // Set window properties
+        addStudentFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        addStudentFrame.setResizable(false);
+        addStudentFrame.setLocationRelativeTo(null); // Center the window
+        addStudentFrame.setVisible(true);
+    }
+
+   private void deleteStudent(String eventName) {
+        File eventFile = new File(eventName + ".csv");
+
+        if (!eventFile.exists()) {
+            JOptionPane.showMessageDialog(null, "The event file does not exist.");
+            return;
         }
-    });
 
-    // Set window properties
-    addStudentFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-    addStudentFrame.setResizable(false);
-    addStudentFrame.setLocationRelativeTo(null); // Center the window
-    addStudentFrame.setVisible(true);
-}
-
-    private void deleteStudent(String eventName) {
-        try {
-            File eventFile = new File(eventName + ".csv");
-            BufferedReader reader = new BufferedReader(new FileReader(eventFile));
+        try (BufferedReader reader = new BufferedReader(new FileReader(eventFile))) {
             ArrayList<String> studentList = new ArrayList<>();
             String line;
+
             while ((line = reader.readLine()) != null) {
                 studentList.add(line);
             }
-            reader.close();
 
             String studentIdToDelete = JOptionPane.showInputDialog("Enter the Student ID to delete:");
-            int confirm = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete the Student: " + studentIdToDelete + "?", " ", JOptionPane.YES_NO_OPTION);
-            
-            if(confirm == JOptionPane.YES_OPTION){
-                // Remove the student with the given ID
-            studentList.removeIf(student -> student.split(",")[0].equals(studentIdToDelete));
-            }
 
-            
-
-            // Rewrite the file without the deleted student
-            BufferedWriter writer = new BufferedWriter(new FileWriter(eventFile));
+            // Check if the studentIdToDelete is valid
+            boolean studentFound = false;
             for (String student : studentList) {
-                writer.write(student + "\n");
+                if (student.split(",")[0].equals(studentIdToDelete)) {
+                    studentFound = true;
+                    break;
+                }
             }
-            writer.close();
-            loadAttendanceData(eventName); // Refresh the attendance table
+
+            if (!studentFound) {
+                JOptionPane.showMessageDialog(null, "Student ID not found.");
+                return;
+            }
+
+            int confirm = JOptionPane.showConfirmDialog(null, 
+                    "Are you sure you want to delete the Student: " + studentIdToDelete + "?", 
+                    "Confirm Deletion", 
+                    JOptionPane.YES_NO_OPTION);
+
+            if (confirm == JOptionPane.YES_OPTION) {
+                // Remove the student with the given ID
+                studentList.removeIf(student -> student.split(",")[0].equals(studentIdToDelete));
+
+                // Rewrite the file without the deleted student
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter(eventFile))) {
+                    for (String student : studentList) {
+                        writer.write(student + "\n");
+                    }
+                }
+
+                loadAttendanceData(eventName); // Refresh the attendance table
+            }
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null, "Error deleting student: " + e.getMessage());
         }
