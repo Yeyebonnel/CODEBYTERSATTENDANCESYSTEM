@@ -1,13 +1,10 @@
 package codebytersattendancesystem;
 
 import static codebytersattendancesystem.Mainpage.createEventbtn;
-import static codebytersattendancesystem.Mainpage.dashboardLabel;
 import static codebytersattendancesystem.Mainpage.deletebtn;
 import static codebytersattendancesystem.Mainpage.logoutbtn;
-import static codebytersattendancesystem.Mainpage.tableModel;
 import static codebytersattendancesystem.Mainpage.panelCenter;
 import static codebytersattendancesystem.Mainpage.panelWest;
-import static codebytersattendancesystem.Mainpage.searchPanel;
 import static codebytersattendancesystem.Mainpage.table;
 import static codebytersattendancesystem.Mainpage.tableModel;
 import static codebytersattendancesystem.Mainpage.updatebtn;
@@ -47,8 +44,7 @@ import javax.swing.table.TableRowSorter;
 
 class EventManager{
     
-    void createEventFile(String eventName) {
-        
+    void createEventFile(String eventName) { 
         try {
             String currentDate = new SimpleDateFormat("YYYY-MM-dd").format(new Date());
             String fileName = eventName + ".csv";
@@ -92,35 +88,34 @@ class EventManager{
     } 
 
     void updateEvent(JTable table) {
-    int selectedRow = table.getSelectedRow();
+        int selectedRow = table.getSelectedRow();
     
-    if (selectedRow >= 0) {
-        String eventName = (String) tableModel.getValueAt(selectedRow, 0);
+        if (selectedRow >= 0) {
+            String eventName = (String) tableModel.getValueAt(selectedRow, 0);//KANAG INDEX 0 MAO NA SYA ANG FIRST COLUMN
 
-        // Open a dialog to update the event name
-        String newEventName = JOptionPane.showInputDialog("Enter new event name:", eventName);
-        
-        if (newEventName != null && !newEventName.trim().isEmpty()) {
-            // Update the event in the table (remove date-related code)
-            tableModel.setValueAt(newEventName, selectedRow, 0);
+            // Open a dialog to update the event name
+            String newEventName = JOptionPane.showInputDialog("Enter new event name:", eventName);//KANANG EVENTNAME PLACE HOLDER NA SYA
 
-            // Rename the event file (no need to handle the date)
-            File oldFile = new File(eventName + ".csv");
-            File newFile = new File(newEventName + ".csv");
+            if (newEventName != null && !newEventName.trim().isEmpty()) {
+                // Update the event in the table (remove date-related code)
+                tableModel.setValueAt(newEventName, selectedRow, 0);
 
-            if (oldFile.exists() && oldFile.renameTo(newFile)) {
-                JOptionPane.showMessageDialog(null, "Event file renamed successfully.");
+                // Rename the event file (no need to handle the date)
+                File oldFile = new File(eventName + ".csv");
+                File newFile = new File(newEventName + ".csv");
+
+                if (oldFile.exists() && oldFile.renameTo(newFile)) {
+                    JOptionPane.showMessageDialog(null, "Event file renamed successfully.");
+                } else {
+                    JOptionPane.showMessageDialog(null, "Error renaming the event file.");
+                }
             } else {
-                JOptionPane.showMessageDialog(null, "Error renaming the event file.");
+                JOptionPane.showMessageDialog(null, "Event name cannot be empty.");
             }
         } else {
-            JOptionPane.showMessageDialog(null, "Event name cannot be empty.");
+            JOptionPane.showMessageDialog(null, "Please select an event to update.");
         }
-    } else {
-        JOptionPane.showMessageDialog(null, "Please select an event to update.");
     }
-}
-
 
     
     void deleteEvent(JTable table) {
@@ -369,6 +364,7 @@ class EventManager{
             panelCenter.repaint();
             
             panelWest.removeAll();
+            dashboardLabel.setText("DASHBOARD");
             panelWest.add(dashboardLabel);
             panelWest.add(Box.createVerticalStrut(50));
             panelWest.add(createEventbtn);

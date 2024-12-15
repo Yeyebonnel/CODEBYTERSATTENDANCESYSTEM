@@ -22,26 +22,24 @@ class Mainpage{
     static JButton deletebtn;
     static JButton logoutbtn;
     
-    void HomePage() {  
+    void HomePage() {  //mao ni ang method na gi tawag sa login page na mo gawas
         
         
         JFrame mainFrame = new JFrame("CODEBYTERS ATTENDANCE SYSTEM");
         mainFrame.setSize(800, 550);
         mainFrame.setLayout(new BorderLayout());
         
-        Image icon = Toolkit.getDefaultToolkit().getImage("C:\\Bonnel Jhon Files\\codebyters_logo.png");
+        Image icon = Toolkit.getDefaultToolkit().getImage("C:\\Bonnel Jhon Files\\codebyters_logo.png");// kini na part sa sa icon mismo sa atoang frame instead na java logo cb logo mo gawas
         mainFrame.setIconImage(icon);
         
         
-        EventManager eventManager = new EventManager();
+        EventManager eventManager = new EventManager();//nag create tag class para sa pag handle ug different eveents sa ataong code like add,delete, etc
 
 
         JPanel panelOne = new JPanel();
         panelOne.setLayout(null); 
         panelOne.setPreferredSize(new Dimension(800, 100));  
         panelOne.setBackground(Color.black);
-        panelOne.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0)); 
-
 
         ImageIcon originalImageIcon = new ImageIcon("C:\\Bonnel Jhon Files\\ATTENDANCE SYSTEM.jpg"); 
         Image image = originalImageIcon.getImage(); 
@@ -53,17 +51,15 @@ class Mainpage{
 
 
         panelWest = new JPanel();
-        panelWest.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));  
+        panelWest.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));  //This creates an empty border with specific spacing.
         panelWest.setPreferredSize(new Dimension(180, 500));  
-        panelWest.setLayout(new BoxLayout(panelWest, BoxLayout.Y_AXIS)); 
-
+        panelWest.setLayout(new BoxLayout(panelWest, BoxLayout.Y_AXIS)); // a layout manager na naga plastar ug mga components in a single row or column.
 
         dashboardLabel = new JLabel("DASHBOARD");
         dashboardLabel.setFont(new Font("Arial", Font.BOLD, 16));  
         dashboardLabel.setAlignmentX(Component.CENTER_ALIGNMENT);  
         panelWest.add(dashboardLabel);  
         panelWest.add(Box.createVerticalStrut(50));
-
 
         createEventbtn = new JButton("Create Event");
         createEventbtn.setPreferredSize(new Dimension(120, 30));
@@ -166,9 +162,7 @@ class Mainpage{
                 JFrame currentFrame = (JFrame) SwingUtilities.getWindowAncestor(logoutbtn);
                 currentFrame.setVisible(false);  // Hide the current frame
                 
-                // Show the Login Page by calling the main method of the LoginPageCodebytersAttendanceSystem class
-                // Assuming LoginPageCodebytersAttendanceSystem is a class with a main method to start the login page
-                LoginPageCodebytersAttendanceSystem.main(new String[0]);
+                
             }
         });
         panelWest.add(logoutbtn);
